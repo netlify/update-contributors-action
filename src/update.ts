@@ -81,8 +81,11 @@ const getGitHubContributors = async (token: string) => {
   return contributors
 }
 
-const updatePackageJson = async (packageJson: readPackage.NormalizedPackageJson) => {
-  await fs.writeFile('package.json', JSON.stringify(packageJson, null, 2), 'utf-8')
+const updatePackageJson = async (contributors: string[]) => {
+  // eslint-disable-next-line unicorn/prefer-json-parse-buffer
+  const jsonFile = JSON.parse(await fs.readFile('package.json', 'utf8'))
+  jsonFile.contributors = contributors
+  await fs.writeFile('package.json', JSON.stringify(jsonFile, null, 2), 'utf-8')
 }
 
 export const updateContributors = async (token: string) => {
@@ -108,5 +111,5 @@ export const updateContributors = async (token: string) => {
     return createContributorString({ name: fullName, email, url })
   })
 
-  return updatePackageJson({ ...packageJson, contributors: newContributors })
+  return updatePackageJson(newContributors)
 }

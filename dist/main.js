@@ -15167,8 +15167,10 @@ var getGitHubContributors = async (token) => {
   const contributors = await Promise.all(contributorList.filter(({ type }) => type === "User").map((user) => octokit.request("GET /users/{username}", { username: user.login }).then(({ data }) => data)));
   return contributors;
 };
-var updatePackageJson = async (packageJson) => {
-  await import_fs.promises.writeFile("package.json", JSON.stringify(packageJson, null, 2), "utf-8");
+var updatePackageJson = async (contributors) => {
+  const jsonFile = JSON.parse(await import_fs.promises.readFile("package.json", "utf8"));
+  jsonFile.contributors = contributors;
+  await import_fs.promises.writeFile("package.json", JSON.stringify(jsonFile, null, 2), "utf-8");
 };
 var updateContributors = async (token) => {
   const [mailList, packageJson, contributors] = await Promise.all([
@@ -15186,7 +15188,7 @@ var updateContributors = async (token) => {
     }
     return createContributorString({ name: fullName, email, url });
   });
-  return updatePackageJson({ ...packageJson, contributors: newContributors });
+  return updatePackageJson(newContributors);
 };
 
 // src/main.ts
