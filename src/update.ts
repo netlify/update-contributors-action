@@ -1,4 +1,5 @@
 import { promises as fs } from 'fs'
+import process from 'process'
 
 import github = require('@actions/github')
 import execa = require('execa')
@@ -63,26 +64,39 @@ const matchExisting = (cont: Contributor, name: string, fullName: string, email:
 const getGitHubContributors = async (token: string) => {
   const octokit = github.getOctokit(token)
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const [owner, repo] = process.env.GITHUB_REPOSITORY!.split('/')
   const contributorList = await octokit.paginate('GET /repos/{owner}/{repo}/contributors', {
     per_page: 100,
-    owner: 'netlify',
-    repo: 'cli',
+    owner,
+    repo,
   })
 
   // get the user information for each contributor
-  const contributors = (await Promise.all(
+  const contributors = await Promise.all(
     contributorList
       .filter(({ type }) => type === 'User')
-      .map((user) =>
-        octokit.request('GET /users/{username}', { username: user.login as string }).then(({ data }) => data),
-      ),
-  )) as GitHubUser[]
+      .map((user) => octokit.rest.users.getByUsername({ username: user.login as string }).then(({ data }) => data)),
+  )
 
-  return contributors
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const currentActor = process.env.GITHUB_ACTOR!
+  // add the current user to the list of contributors if needed
+  if (!contributorList.some((user) => user.login === currentActor)) {
+    const { data: currentUser } = await octokit.rest.users.getByUsername({ username: currentActor })
+    if (currentUser.type === 'User') {
+      return [...contributors, currentUser] as GitHubUser[]
+    }
+  }
+
+  return contributors as GitHubUser[]
 }
 
-const updatePackageJson = async (packageJson: readPackage.NormalizedPackageJson) => {
-  await fs.writeFile('package.json', JSON.stringify(packageJson, null, 2), 'utf-8')
+const updatePackageJson = async (contributors: string[]) => {
+  // eslint-disable-next-line unicorn/prefer-json-parse-buffer
+  const jsonFile = JSON.parse(await fs.readFile('package.json', 'utf8'))
+  jsonFile.contributors = contributors
+  await fs.writeFile('package.json', `${JSON.stringify(jsonFile, null, 2)}\n`, 'utf-8')
 }
 
 export const updateContributors = async (token: string) => {
@@ -108,5 +122,5 @@ export const updateContributors = async (token: string) => {
     return createContributorString({ name: fullName, email, url })
   })
 
-  return updatePackageJson({ ...packageJson, contributors: newContributors })
+  return updatePackageJson(newContributors.sort())
 }
