@@ -15166,13 +15166,21 @@ var getGitHubContributors = async (token) => {
     owner,
     repo
   });
-  const contributors = await Promise.all(contributorList.filter(({ type }) => type === "User").map((user) => octokit.request("GET /users/{username}", { username: user.login }).then(({ data }) => data)));
+  const contributors = await Promise.all(contributorList.filter(({ type }) => type === "User").map((user) => octokit.rest.users.getByUsername({ username: user.login }).then(({ data }) => data)));
+  const currentActor = import_process.default.env.GITHUB_ACTOR;
+  if (!contributorList.some((user) => user.login === currentActor)) {
+    const { data: currentUser } = await octokit.rest.users.getByUsername({ username: currentActor });
+    if (currentUser.type === "User") {
+      return [...contributors, currentUser];
+    }
+  }
   return contributors;
 };
 var updatePackageJson = async (contributors) => {
   const jsonFile = JSON.parse(await import_fs.promises.readFile("package.json", "utf8"));
   jsonFile.contributors = contributors;
-  await import_fs.promises.writeFile("package.json", JSON.stringify(jsonFile, null, 2), "utf-8");
+  await import_fs.promises.writeFile("package.json", `${JSON.stringify(jsonFile, null, 2)}
+`, "utf-8");
 };
 var updateContributors = async (token) => {
   const [mailList, packageJson, contributors] = await Promise.all([
@@ -15190,7 +15198,7 @@ var updateContributors = async (token) => {
     }
     return createContributorString({ name: fullName, email, url });
   });
-  return updatePackageJson(newContributors);
+  return updatePackageJson(newContributors.sort());
 };
 
 // src/main.ts
