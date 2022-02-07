@@ -88,7 +88,7 @@ const updatePackageJson = async (contributors: string[]) => {
   // eslint-disable-next-line unicorn/prefer-json-parse-buffer
   const jsonFile = JSON.parse(await fs.readFile('package.json', 'utf8'))
   jsonFile.contributors = contributors
-  await fs.writeFile('package.json', JSON.stringify(jsonFile, null, 2), 'utf-8')
+  await fs.writeFile('package.json', `${JSON.stringify(jsonFile, null, 2)}\n`, 'utf-8')
 }
 
 export const updateContributors = async (token: string) => {
