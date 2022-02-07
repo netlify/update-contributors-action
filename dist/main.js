@@ -7191,11 +7191,11 @@ var require_signals2 = __commonJS({
 // node_modules/signal-exit/index.js
 var require_signal_exit = __commonJS({
   "node_modules/signal-exit/index.js"(exports, module2) {
-    var process3 = global.process;
-    var processOk = function(process4) {
-      return process4 && typeof process4 === "object" && typeof process4.removeListener === "function" && typeof process4.emit === "function" && typeof process4.reallyExit === "function" && typeof process4.listeners === "function" && typeof process4.kill === "function" && typeof process4.pid === "number" && typeof process4.on === "function";
+    var process4 = global.process;
+    var processOk = function(process5) {
+      return process5 && typeof process5 === "object" && typeof process5.removeListener === "function" && typeof process5.emit === "function" && typeof process5.reallyExit === "function" && typeof process5.listeners === "function" && typeof process5.kill === "function" && typeof process5.pid === "number" && typeof process5.on === "function";
     };
-    if (!processOk(process3)) {
+    if (!processOk(process4)) {
       module2.exports = function() {
         return function() {
         };
@@ -7203,15 +7203,15 @@ var require_signal_exit = __commonJS({
     } else {
       assert = require("assert");
       signals = require_signals2();
-      isWin = /^win/i.test(process3.platform);
+      isWin = /^win/i.test(process4.platform);
       EE = require("events");
       if (typeof EE !== "function") {
         EE = EE.EventEmitter;
       }
-      if (process3.__signal_exit_emitter__) {
-        emitter = process3.__signal_exit_emitter__;
+      if (process4.__signal_exit_emitter__) {
+        emitter = process4.__signal_exit_emitter__;
       } else {
-        emitter = process3.__signal_exit_emitter__ = new EE();
+        emitter = process4.__signal_exit_emitter__ = new EE();
         emitter.count = 0;
         emitter.emitted = {};
       }
@@ -7248,12 +7248,12 @@ var require_signal_exit = __commonJS({
         loaded = false;
         signals.forEach(function(sig) {
           try {
-            process3.removeListener(sig, sigListeners[sig]);
+            process4.removeListener(sig, sigListeners[sig]);
           } catch (er) {
           }
         });
-        process3.emit = originalProcessEmit;
-        process3.reallyExit = originalProcessReallyExit;
+        process4.emit = originalProcessEmit;
+        process4.reallyExit = originalProcessReallyExit;
         emitter.count -= 1;
       };
       module2.exports.unload = unload;
@@ -7270,7 +7270,7 @@ var require_signal_exit = __commonJS({
           if (!processOk(global.process)) {
             return;
           }
-          var listeners = process3.listeners(sig);
+          var listeners = process4.listeners(sig);
           if (listeners.length === emitter.count) {
             unload();
             emit("exit", null, sig);
@@ -7278,7 +7278,7 @@ var require_signal_exit = __commonJS({
             if (isWin && sig === "SIGHUP") {
               sig = "SIGINT";
             }
-            process3.kill(process3.pid, sig);
+            process4.kill(process4.pid, sig);
           }
         };
       });
@@ -7294,35 +7294,35 @@ var require_signal_exit = __commonJS({
         emitter.count += 1;
         signals = signals.filter(function(sig) {
           try {
-            process3.on(sig, sigListeners[sig]);
+            process4.on(sig, sigListeners[sig]);
             return true;
           } catch (er) {
             return false;
           }
         });
-        process3.emit = processEmit;
-        process3.reallyExit = processReallyExit;
+        process4.emit = processEmit;
+        process4.reallyExit = processReallyExit;
       };
       module2.exports.load = load;
-      originalProcessReallyExit = process3.reallyExit;
+      originalProcessReallyExit = process4.reallyExit;
       processReallyExit = function processReallyExit2(code) {
         if (!processOk(global.process)) {
           return;
         }
-        process3.exitCode = code || 0;
-        emit("exit", process3.exitCode, null);
-        emit("afterexit", process3.exitCode, null);
-        originalProcessReallyExit.call(process3, process3.exitCode);
+        process4.exitCode = code || 0;
+        emit("exit", process4.exitCode, null);
+        emit("afterexit", process4.exitCode, null);
+        originalProcessReallyExit.call(process4, process4.exitCode);
       };
-      originalProcessEmit = process3.emit;
+      originalProcessEmit = process4.emit;
       processEmit = function processEmit2(ev, arg) {
         if (ev === "exit" && processOk(global.process)) {
           if (arg !== void 0) {
-            process3.exitCode = arg;
+            process4.exitCode = arg;
           }
           var ret = originalProcessEmit.apply(this, arguments);
-          emit("exit", process3.exitCode, null);
-          emit("afterexit", process3.exitCode, null);
+          emit("exit", process4.exitCode, null);
+          emit("afterexit", process4.exitCode, null);
           return ret;
         } else {
           return originalProcessEmit.apply(this, arguments);
@@ -15128,10 +15128,11 @@ Support boolean input list: \`true | True | TRUE | false | False | FALSE\``);
 });
 
 // src/main.ts
-var import_process = __toESM(require("process"));
+var import_process2 = __toESM(require("process"));
 
 // src/update.ts
 var import_fs = require("fs");
+var import_process = __toESM(require("process"));
 var github = require_github();
 var execa = require_execa();
 var readPackage = require_read_pkg();
@@ -15159,10 +15160,11 @@ var getUserDetails = (mailList, user) => {
 var matchExisting = (cont, name, fullName, email, url) => cont.name === fullName || cont.name.startsWith(name) || cont.email && cont.email === email || cont.url && cont.url === url;
 var getGitHubContributors = async (token) => {
   const octokit = github.getOctokit(token);
+  const [owner, repo] = import_process.default.env.GITHUB_REPOSITORY.split("/");
   const contributorList = await octokit.paginate("GET /repos/{owner}/{repo}/contributors", {
     per_page: 100,
-    owner: "netlify",
-    repo: "cli"
+    owner,
+    repo
   });
   const contributors = await Promise.all(contributorList.filter(({ type }) => type === "User").map((user) => octokit.request("GET /users/{username}", { username: user.login }).then(({ data }) => data)));
   return contributors;
@@ -15194,7 +15196,7 @@ var updateContributors = async (token) => {
 // src/main.ts
 var core = require_core5();
 var getInputs = () => {
-  const githubToken = core.getInput("github-token") || import_process.default.env.GITHUB_TOKEN || "";
+  const githubToken = core.getInput("github-token") || import_process2.default.env.GITHUB_TOKEN || "";
   return { githubToken };
 };
 var validateInputs = ({ githubToken }) => {

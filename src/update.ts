@@ -1,4 +1,5 @@
 import { promises as fs } from 'fs'
+import process from 'process'
 
 import github = require('@actions/github')
 import execa = require('execa')
@@ -63,10 +64,12 @@ const matchExisting = (cont: Contributor, name: string, fullName: string, email:
 const getGitHubContributors = async (token: string) => {
   const octokit = github.getOctokit(token)
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const [owner, repo] = process.env.GITHUB_REPOSITORY!.split('/')
   const contributorList = await octokit.paginate('GET /repos/{owner}/{repo}/contributors', {
     per_page: 100,
-    owner: 'netlify',
-    repo: 'cli',
+    owner,
+    repo,
   })
 
   // get the user information for each contributor
