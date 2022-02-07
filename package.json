@@ -8,7 +8,7 @@
     "dist/**/*.d.ts"
   ],
   "contributors": [
-    "Lukas Holzer (lukasholzer) <lukas.holzer@netlify.com>"
+    "Erez Rokah (https://twitter.com/erezrokah)"
   ],
   "scripts": {
     "prepare": "husky install node_modules/@netlify/eslint-config-node/.husky/ && esbuild src/main.ts --bundle --outdir=dist --platform=node",
