@@ -73,15 +73,23 @@ const getGitHubContributors = async (token: string) => {
   })
 
   // get the user information for each contributor
-  const contributors = (await Promise.all(
+  const contributors = await Promise.all(
     contributorList
       .filter(({ type }) => type === 'User')
-      .map((user) =>
-        octokit.request('GET /users/{username}', { username: user.login as string }).then(({ data }) => data),
-      ),
-  )) as GitHubUser[]
+      .map((user) => octokit.rest.users.getByUsername({ username: user.login as string }).then(({ data }) => data)),
+  )
 
-  return contributors
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const currentActor = process.env.GITHUB_ACTOR!
+  // add the current user to the list of contributors if needed
+  if (!contributorList.some((user) => user.login === currentActor)) {
+    const { data: currentUser } = await octokit.rest.users.getByUsername({ username: currentActor })
+    if (currentUser.type === 'User') {
+      return [...contributors, currentUser] as GitHubUser[]
+    }
+  }
+
+  return contributors as GitHubUser[]
 }
 
 const updatePackageJson = async (contributors: string[]) => {
@@ -114,5 +122,5 @@ export const updateContributors = async (token: string) => {
     return createContributorString({ name: fullName, email, url })
   })
 
-  return updatePackageJson(newContributors)
+  return updatePackageJson(newContributors.sort())
 }
