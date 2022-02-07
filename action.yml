@@ -1,0 +1,15 @@
+name: 'Update Contributors'
+author:
+  'Lukas Holzer (lukasholzer) <lukas.holzer@netlify.com> (https://twitter.com/luka5c0m),Erez Rokah (erezrokah)
+  <erez@netlify.com>'
+description: 'A GitHub action to update package.json contributors'
+inputs:
+  github-token:
+    required: true
+    description: 'GitHub token with write access'
+runs:
+  using: 'node16'
+  main: 'dist/main.js'
+branding:
+  icon: 'refresh-cw'
+  color: 'green'
