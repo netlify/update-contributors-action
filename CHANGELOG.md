@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.1](https://github.com/netlify/update-contributors-action/compare/v1.0.0...v1.0.1) (2022-08-01)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @actions/core to v1.7.0 ([#34](https://github.com/netlify/update-contributors-action/issues/34)) ([ce761a9](https://github.com/netlify/update-contributors-action/commit/ce761a9a54962f0dddad4ba212c84ffe4df41f0d))
+* **deps:** update dependency @actions/core to v1.8.0 ([#35](https://github.com/netlify/update-contributors-action/issues/35)) ([f3ceb4a](https://github.com/netlify/update-contributors-action/commit/f3ceb4a826238531396ec1902c5b00d8deb1a74e))
+* **deps:** update dependency @actions/core to v1.8.2 ([#39](https://github.com/netlify/update-contributors-action/issues/39)) ([07d1621](https://github.com/netlify/update-contributors-action/commit/07d1621a8bdc816bf9ec2780fb5525049f1ace2d))
+* **deps:** update dependency @actions/core to v1.9.0 ([#53](https://github.com/netlify/update-contributors-action/issues/53)) ([993fda9](https://github.com/netlify/update-contributors-action/commit/993fda9b04532ca632c1453a6e411ed88451889f))
+* **deps:** update dependency @actions/github to v5.0.1 ([#25](https://github.com/netlify/update-contributors-action/issues/25)) ([20b20e4](https://github.com/netlify/update-contributors-action/commit/20b20e44339c5883ed495078b9ac8ba1cccbd5a9))
+* **deps:** update dependency @actions/github to v5.0.3 ([#40](https://github.com/netlify/update-contributors-action/issues/40)) ([4d67ba9](https://github.com/netlify/update-contributors-action/commit/4d67ba99d3e2bbebed5343a85762c7254f461b85))
+
 ## 1.0.0 (2022-02-14)
 
 
